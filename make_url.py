@@ -5,6 +5,9 @@ from pptx import Presentation
 from pptx.util import Inches, Pt
 from pptx.enum.text import PP_ALIGN
 from io import BytesIO
+import logging
+
+logging.getLogger("streamlit").setLevel(logging.ERROR)
 
 # 短縮URLを作成する関数
 def create_short_url(long_url):
