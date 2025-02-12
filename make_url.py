@@ -9,10 +9,13 @@ import logging
 
 logging.getLogger("streamlit").setLevel(logging.ERROR)
 
-# 短縮URLを作成する関数
+# 短縮URLを作成する関数（エラーハンドリング追加）
 def create_short_url(long_url):
-    s = pyshorteners.Shortener()
-    return s.tinyurl.short(long_url)
+    try:
+        s = pyshorteners.Shortener()
+        return s.tinyurl.short(long_url)
+    except Exception:
+        return "url エラー"
 
 # URLをQRコード（画像）にする関数
 def create_qr_code(url):
@@ -65,32 +68,36 @@ long_url = st.text_input("短縮したいURLを入力してください:")
 if long_url:
     # 短縮URL作成
     short_url = create_short_url(long_url)
-    st.markdown(f"### 短縮URL: [ {short_url} ]({short_url})")
 
-    # QRコード作成
-    qr_img = create_qr_code(short_url)
-    qr_stream = BytesIO()
-    qr_img.save(qr_stream, format='PNG')
-    qr_stream.seek(0)
+    if short_url == "url エラー":
+        st.error("URLの短縮に失敗しました。")
+    else:
+        st.markdown(f"### 短縮URL: [ {short_url} ]({short_url})")
 
-    # QRコード表示
-    st.image(qr_stream, caption="QRコード", use_column_width=False)
+        # QRコード作成
+        qr_img = create_qr_code(short_url)
+        qr_stream = BytesIO()
+        qr_img.save(qr_stream, format='PNG')
+        qr_stream.seek(0)
 
-    # QRコードダウンロード
-    st.download_button(
-        label="QRコードをダウンロード",
-        data=qr_stream,
-        file_name="qr_code.png",
-        mime="image/png"
-    )
+        # QRコード表示
+        st.image(qr_stream, caption="QRコード", use_column_width=False)
 
-    # PowerPoint作成
-    ppt_stream = create_ppt(short_url, qr_img)
+        # QRコードダウンロード
+        st.download_button(
+            label="QRコードをダウンロード",
+            data=qr_stream,
+            file_name="qr_code.png",
+            mime="image/png"
+        )
 
-    # PowerPointダウンロード
-    st.download_button(
-        label="PPTXをダウンロード",
-        data=ppt_stream,
-        file_name="アンケート_スライド.pptx",
-        mime="application/vnd.openxmlformats-officedocument.presentationml.presentation"
-    )
+        # PowerPoint作成
+        ppt_stream = create_ppt(short_url, qr_img)
+
+        # PowerPointダウンロード
+        st.download_button(
+            label="PPTXをダウンロード",
+            data=ppt_stream,
+            file_name="アンケート_スライド.pptx",
+            mime="application/vnd.openxmlformats-officedocument.presentationml.presentation"
+        )
