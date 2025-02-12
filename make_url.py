@@ -57,7 +57,7 @@ def create_ppt(short_url, qr_img):
     return ppt_stream
 
 # Streamlitアプリ
-st.title("URL短縮 & QRコード生成ツール")
+st.title("URL短縮 & QRコード生成")
 
 # ユーザー入力
 long_url = st.text_input("短縮したいURLを入力してください:")
